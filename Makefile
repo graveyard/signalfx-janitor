@@ -1,13 +1,18 @@
+include golang.mk
+
 .PHONY: all test build run
 SHELL := /bin/bash
+PKGS = $(shell go list ./... | grep -v "vendor/" )
+$(eval $(call golang-version-check,1.8))
 
 all: test build
 
-test:
-	echo "TODO test app"
+test: $(PKGS)
+$(PKGS): golang-test-all-deps
+	$(call golang-test-all,$@)
 
 build:
-	echo "TODO build app"
+	go build
 
 run: build
-	echo "TODO run app"
+	./signalfx-janitor
