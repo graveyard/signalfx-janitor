@@ -86,12 +86,12 @@ func resolveIncidents(incidents []SimpleIncident) error {
 	return nil
 }
 
-// EventTimeSeries (V1 API)V1)
+// EventTimeSeries (V1 API)
 type EventTimeSeries struct {
 	RS []EventTimeSeriesRS `json:"rs"`
 }
 
-// EventTimeSeries (V1 API)V1)
+// EventTimeSeries (V1 API)
 type EventTimeSeriesRS struct {
 	IncidentID   string  `json:"sf_incidentId"`
 	UpdatedOnMs  float64 `json:"sf_updatedOnMs"`
