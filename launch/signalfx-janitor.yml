@@ -1,5 +1,5 @@
 run:
-  type: workflow
+  type: docker
 env:
 - SFX_TOKEN
 - SFX_ORG_ID
