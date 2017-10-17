@@ -71,9 +71,9 @@ func GetV1Incidents() ([]SimpleIncident, error) {
 
 func resolveIncidents(incidents []SimpleIncident) error {
 	for _, i := range incidents {
-		fmt.Println("Incident:", i)
+		log.Println("Incident:", i)
 		shouldAutoResolve := i.CreatedAt.Before(time.Now().Add(-30 * time.Minute))
-		fmt.Println("Should auto resolve:", shouldAutoResolve)
+		log.Println("Should auto resolve:", shouldAutoResolve)
 		if shouldAutoResolve {
 			err := clearIncident(i.ID)
 			if err != nil {
@@ -156,7 +156,7 @@ func clearIncident(incidentID string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("error:", string(body))
+		log.Println("error:", string(body))
 		return fmt.Errorf("Error clearing incident %s, got StatusCode %d", incidentID, resp.StatusCode)
 	}
 
