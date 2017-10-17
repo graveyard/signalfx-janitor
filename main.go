@@ -30,7 +30,7 @@ func main() {
 		log.Fatal("error looking up incidents:", err.Error())
 	}
 
-	fmt.Printf("Found %d incidents\n", len(incidents))
+	log.Printf("Found %d incidents\n", len(incidents))
 
 	err = resolveIncidents(incidents)
 	if err != nil {
@@ -80,7 +80,7 @@ func resolveIncidents(incidents []SimpleIncident) error {
 				return fmt.Errorf("error resolving incident %s: %s ", i.ID, err.Error())
 			}
 		}
-		fmt.Println("")
+		log.Println("")
 	}
 
 	return nil
