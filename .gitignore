@@ -8,4 +8,4 @@
 .\#*
 
 # binary
-signalfx-janitor
+bin/
