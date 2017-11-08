@@ -23,3 +23,7 @@ run: build
 	  --region us-west-2 \
 	  --workername `hostname` \
 	  --cmd ./bin/$(EXECUTABLE)
+
+
+install_deps: golang-dep-vendor-deps
+	$(call golang-dep-vendor)
