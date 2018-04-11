@@ -28,10 +28,12 @@ func envOrDie(s string) string {
 }
 
 func main() {
-	var flags struct {
+	flags := struct {
 		Task     string `config:"task,required"`
 		Detector string `config:"detector"`
 		Duration string `config:"duration"`
+	}{
+		Task: "stale",
 	}
 
 	if err := configure.Configure(&flags); err != nil {
