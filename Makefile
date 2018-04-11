@@ -23,7 +23,7 @@ run: build
 	  --region us-west-2 \
 		--cloudwatchregion us-west-1 \
 	  --workername `hostname` \
-	  --cmd ./bin/$(EXECUTABLE)
+	  --cmd ./bin/$(EXECUTABLE) -task=stale
 
 
 install_deps: golang-dep-vendor-deps

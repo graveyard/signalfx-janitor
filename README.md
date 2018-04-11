@@ -1,6 +1,7 @@
 # signalfx-janitor
 
-Cleans up stale alerts in SignalFX
+Cleans up stale alerts in SignalFX,
+Alternatively mutes noisy alerts for a specified amount of time.
 
 Owned by `eng-infra`.
 
