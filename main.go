@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/Clever/configure"
 )
 
 const baseURL = "https://api.signalfx.com/"
@@ -25,16 +28,47 @@ func envOrDie(s string) string {
 }
 
 func main() {
-	incidents, err := GetV1Incidents()
-	if err != nil {
-		log.Fatal("error looking up incidents:", err.Error())
+	flags := struct {
+		Task     string `config:"task,required"`
+		Detector string `config:"detector"`
+		Duration string `config:"duration"`
+	}{
+		Task: "stale",
 	}
 
-	log.Printf("Found %d incidents\n", len(incidents))
+	if err := configure.Configure(&flags); err != nil {
+		log.Fatalf("Configure parse error: " + err.Error())
+	}
 
-	err = resolveIncidents(incidents)
-	if err != nil {
-		log.Fatal("error resolving incidents:", err.Error())
+	switch flags.Task {
+	case "stale":
+		incidents, err := GetV1Incidents()
+		if err != nil {
+			log.Fatal("error looking up incidents:", err.Error())
+		}
+
+		log.Printf("Found %d incidents\n", len(incidents))
+
+		err = resolveIncidents(incidents)
+		if err != nil {
+			log.Fatal("error resolving incidents:", err.Error())
+		}
+	case "mute":
+		if flags.Detector == "" || flags.Duration == "" {
+			log.Fatal("mute requires both detector and duration flags")
+		}
+
+		duration, err := time.ParseDuration(flags.Duration)
+		if err != nil {
+			log.Fatal("error looking up incidents:", err.Error())
+		}
+
+		err = muteDetector(flags.Detector, duration)
+		if err != nil {
+			log.Fatal("error muting detector:", err.Error())
+		}
+	default:
+		log.Fatal("unexpected task:", flags.Task)
 	}
 }
 
@@ -158,6 +192,48 @@ func clearIncident(incidentID string) error {
 		}
 		log.Println("error:", string(body))
 		return fmt.Errorf("Error clearing incident %s, got StatusCode %d", incidentID, resp.StatusCode)
+	}
+
+	return nil
+}
+
+// muteDetector works for V1 and V2 detectors
+// https://developers.signalfx.com/reference#alertmuting-1
+func muteDetector(detectorID string, silence time.Duration) error {
+	url := baseURL + "v2/alertmuting"
+
+	now := time.Now()
+	round := int64(time.Millisecond) / int64(time.Nanosecond)
+	args := map[string]interface{}{
+		"filters":     []map[string]string{{"property": "sf_detectorId", "propertyValue": detectorID}},
+		"startTime":   now.UnixNano() / round,
+		"stopTime":    now.Add(silence).UnixNano() / round,
+		"description": "Muted by signalfx-janitor",
+	}
+	data, _ := json.Marshal(args)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("X-SF-TOKEN", sfxToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		log.Println("error:", string(body))
+		return fmt.Errorf("Error muting incident %s, got StatusCode %d", detectorID, resp.StatusCode)
 	}
 
 	return nil
