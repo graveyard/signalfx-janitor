@@ -227,13 +227,13 @@ func muteDetector(detectorID string, silence time.Duration) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 201 {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
 		log.Println("error:", string(body))
-		return fmt.Errorf("Error muting incident %s, got StatusCode %d", detectorID, resp.StatusCode)
+		return fmt.Errorf("Error muting detector %s, got StatusCode %d", detectorID, resp.StatusCode)
 	}
 
 	return nil
