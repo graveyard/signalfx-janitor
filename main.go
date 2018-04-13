@@ -29,9 +29,10 @@ func envOrDie(s string) string {
 
 func main() {
 	flags := struct {
-		Task     string `config:"task,required"`
-		Detector string `config:"detector"`
-		Duration string `config:"duration"`
+		Task        string `config:"task,required"`
+		Detector    string `config:"detector"`
+		Duration    string `config:"duration"`
+		Description string `config:"description"`
 	}{
 		Task: "stale",
 	}
@@ -63,7 +64,7 @@ func main() {
 			log.Fatal("error looking up incidents:", err.Error())
 		}
 
-		err = muteDetector(flags.Detector, duration)
+		err = muteDetector(flags.Detector, duration, flags.Description)
 		if err != nil {
 			log.Fatal("error muting detector:", err.Error())
 		}
@@ -199,7 +200,7 @@ func clearIncident(incidentID string) error {
 
 // muteDetector works for V1 and V2 detectors
 // https://developers.signalfx.com/reference#alertmuting-1
-func muteDetector(detectorID string, silence time.Duration) error {
+func muteDetector(detectorID string, silence time.Duration, info string) error {
 	url := baseURL + "v2/alertmuting"
 
 	now := time.Now()
@@ -210,6 +211,10 @@ func muteDetector(detectorID string, silence time.Duration) error {
 		"stopTime":    now.Add(silence).UnixNano() / round,
 		"description": "Muted by signalfx-janitor",
 	}
+	if info != "" {
+		args["description"] = fmt.Sprintf("%s: %s", args["description"], info)
+	}
+
 	data, _ := json.Marshal(args)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
