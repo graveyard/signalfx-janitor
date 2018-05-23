@@ -7,7 +7,7 @@ PKG := github.com/Clever/signalfx-janitor
 PKGS = $(shell go list ./... | grep -v "vendor/" )
 EXECUTABLE = $(shell basename $(PKG))
 SFNCLI_VERSION := latest
-$(eval $(call golang-version-check,1.9))
+$(eval $(call golang-version-check,1.10))
 
 all: test build
 
