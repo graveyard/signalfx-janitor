@@ -73,6 +73,7 @@ func main() {
 	}
 }
 
+// SimpleIncident represents a SignalFX incident
 type SimpleIncident struct {
 	Label     string
 	ID        string
@@ -84,6 +85,7 @@ func (si SimpleIncident) String() string {
 	return fmt.Sprintf("%s (time ago = %s)", si.Label, timeAgo)
 }
 
+// GetV1Incidents gets an array of SimpleIncidents
 func GetV1Incidents() ([]SimpleIncident, error) {
 	eventTimeSeries, err := listActiveIncidentsV1()
 	if err != nil {
@@ -126,7 +128,7 @@ type EventTimeSeries struct {
 	RS []EventTimeSeriesRS `json:"rs"`
 }
 
-// EventTimeSeries (V1 API)
+// EventTimeSeriesRS (V1 API)
 type EventTimeSeriesRS struct {
 	IncidentID   string  `json:"sf_incidentId"`
 	UpdatedOnMs  float64 `json:"sf_updatedOnMs"`
