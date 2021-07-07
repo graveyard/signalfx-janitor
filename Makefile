@@ -4,7 +4,7 @@ include sfncli.mk
 .PHONY: all test build run
 SHELL := /bin/bash
 PKG := github.com/Clever/signalfx-janitor
-PKGS = $(shell go list ./... | grep -v "vendor/" )
+PKGS = $(shell go list ./... | grep -v "vendor/"  | grep -v /vendor)
 EXECUTABLE = $(shell basename $(PKG))
 SFNCLI_VERSION := latest
 $(eval $(call golang-version-check,1.13))
@@ -26,5 +26,5 @@ run: build
 	  --cmd ./bin/$(EXECUTABLE)
 
 
-install_deps: golang-dep-vendor-deps
-	$(call golang-dep-vendor)
+install_deps:
+	go mod vendor
