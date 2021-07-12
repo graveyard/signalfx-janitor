@@ -15,8 +15,7 @@ shepherds:
 expose: []
 team: eng-infra
 autoscaling:
-  metric: active-percent
-  metric_target: 70
   max_count: 1
+  min_count: 1
 pod_config:
   group: us-west-1
