@@ -1,6 +1,6 @@
 module github.com/Clever/signalfx-janitor
 
-go 1.13
+go 1.16
 
 require (
 	github.com/Clever/configure v0.0.0-20181011224629-e78d73be7dbf
